@@ -1,0 +1,28 @@
+= xr.open_mfdataset('/home/lady-josephine/Documents/mauritania/*.nc')
+M
+Mauritania_2 = M.sel(datetime=slice("2001","2010"),lon=(-16.75),lat=(27.25))
+Mauritania_2
+
+Mauritania_precip2 = M['precip']
+Mauritania_precip2
+Dry = Mauritania_precip2
+Dry_days_per_year = (Dry < 1).groupby('datetime.year').sum(dim='datetime')
+Dry_days_per_year
+fig,ax=plt.subplots(5,2,figsize=(20,18),subplot_kw={'projection': ccrs.PlateCarree()})
+ax=ax.flatten()
+month_names=['2001','2002','2003','2004','2005','2006','2007','2008','2009','2010']
+for i in range(10):
+    ax[i].add_feature(cfeature.COASTLINE.with_scale('110m'),linewidth=0.5)
+    ax[i].add_feature(cfeature.BORDERS,linewidth=2)
+    ax[i].add_feature(cfeature.OCEAN)
+    ax[i].add_feature(cfeature.LAKES, color='blue')
+    ax[i].add_feature(cfeature.RIVERS)
+    ax[i].set_extent([-16.75, -5.25, 15.75,27.25], crs=ccrs.PlateCarree())
+    ax[i].set_title(month_names[i])
+cb= ax[i].contourf(Dry_days_per_year.lon,Dry_days_per_year.lat,Dry_days_per_year[i],
+                       cmap='coolwarm', transform=ccrs.PlateCarree())
+    color_bar=fig.add_axes([0.82,0.29,0.025,0.5])
+fig.colorbar(cb,cax=color_bar,label='Precipitation(mm)')
+fig.subplots_adjust(wspace=-0.55, top=0.93)
+plt.suptitle(' DRY DAYS PER YEAR OVER MAURITANIA(>=1MM)', fontweight='bold');
+                                                                                    
